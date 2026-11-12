@@ -1,0 +1,128 @@
+@import "tailwindcss";
+
+/*
+ * Identidade visual "Neo-brutal lúdico" (Opção A).
+ * Tudo que está em @theme vira classe do Tailwind:
+ *   --color-violet  ->  bg-violet, text-violet, border-violet...
+ *   --shadow-hard   ->  shadow-hard
+ *   --radius-card   ->  rounded-card
+ *   --font-display  ->  font-display
+ */
+@theme {
+  /* Marca */
+  --color-violet: #5b3df5; /* ação */
+  --color-violet-deep: #3d22c9;
+  --color-violet-light: #9c87ff; /* violeta sobre fundo escuro */
+  --color-violet-soft: #7a62f7;
+  --color-violet-tint: #eee9ff;
+  --color-lime: #d6f54a; /* recompensa e foco */
+
+  /* Neutros */
+  --color-ink: #16141f; /* texto, contornos, modo foco */
+  --color-ink-soft: #24212f;
+  --color-ink-muted: #2a2737;
+  --color-ink-line: #3a3646;
+  --color-paper: #f5f3ec; /* fundo */
+  --color-paper-deep: #eae6db;
+  --color-paper-line: #d9d5cb;
+  --color-graphite: #5e5a6b; /* texto suave no claro */
+  --color-mist: #a8a4b8; /* texto suave no escuro */
+  --color-fog: #c9c5d6;
+
+  /* Feedback */
+  --color-coral: #ff6b4a; /* errei */
+  --color-coral-tint: #ffe1d9;
+  --color-amber: #ffb938; /* difícil */
+
+  /* Tipografia */
+  --font-display: "Bricolage Grotesque", "Noto Sans JP", system-ui, sans-serif;
+  --font-sans: "Inter", "Noto Sans JP", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, "Cascadia Mono", monospace;
+
+  /* Forma: sombra dura, sem desfoque */
+  --shadow-hard: 4px 4px 0 var(--color-ink);
+  --shadow-hard-sm: 3px 3px 0 var(--color-ink);
+  --shadow-hard-lg: 6px 6px 0 var(--color-ink);
+  --shadow-hard-violet: 4px 4px 0 var(--color-violet);
+  --shadow-hard-lime: 4px 4px 0 var(--color-lime);
+  --shadow-hard-paper: 3px 3px 0 var(--color-paper);
+
+  --radius-chip: 12px;
+  --radius-btn: 14px;
+  --radius-tile: 20px;
+  --radius-card: 28px;
+
+  /* Movimento */
+  --animate-deal-in: deal-in 280ms cubic-bezier(0.2, 0.9, 0.3, 1.2) both;
+  --animate-pop-in: pop-in 180ms cubic-bezier(0.2, 0.9, 0.3, 1.3) both;
+
+  @keyframes deal-in {
+    from {
+      opacity: 0;
+      transform: translateY(18px) rotate(-3deg) scale(0.97);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  @keyframes pop-in {
+    from {
+      opacity: 0;
+      transform: translateY(8px) scale(0.98);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+}
+
+@layer base {
+  html {
+    color-scheme: light;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    margin: 0;
+    background: var(--color-paper-deep);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  a,
+  button {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  button:not(:disabled),
+  select,
+  label[for] {
+    cursor: pointer;
+  }
+
+  /* Foco de teclado sempre visível: violeta no claro, lima no escuro */
+  :focus-visible {
+    outline: 3px solid var(--color-violet);
+    outline-offset: 2px;
+  }
+
+  .tone-dark :focus-visible {
+    outline-color: var(--color-lime);
+  }
+}
+
+/* O clique "afunda": a sombra some e o elemento desce 4px. */
+@utility press {
+  transition:
+    transform 80ms ease,
+    box-shadow 80ms ease;
+
+  &:active:not(:disabled) {
+    transform: translate(4px, 4px);
+    box-shadow: none;
+  }
+}
