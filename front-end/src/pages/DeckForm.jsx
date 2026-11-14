@@ -5,7 +5,7 @@ import { Field, Input, Segmented, Select } from '../components/Field'
 import { Icon } from '../components/Icon'
 import { PageHeader, Screen } from '../components/Screen'
 import { DECK_COLORS, LANGUAGES, languageName } from '../lib/languages'
-import { navigate } from '../lib/router'
+import { useNavigate } from 'react-router'
 import { cx } from '../lib/utils'
 import { useStore } from '../store/context'
 import NotFound from './NotFound'
@@ -27,6 +27,7 @@ export default function DeckForm({ params }) {
 }
 
 function DeckFormFields({ editing, actions, deckCount }) {
+  const navigate = useNavigate()
   const colorKeys = Object.keys(DECK_COLORS)
   const [kind, setKind] = useState(editing?.kind ?? 'language')
   const [name, setName] = useState(editing?.name ?? '')
@@ -62,7 +63,7 @@ function DeckFormFields({ editing, actions, deckCount }) {
   }
 
   return (
-    <Screen>
+    <Screen width="narrow">
       <PageHeader title={editing ? 'Editar baralho' : 'Novo baralho'} backTo={backTo} />
 
       <form onSubmit={handleSubmit} noValidate className="flex flex-1 flex-col gap-5">

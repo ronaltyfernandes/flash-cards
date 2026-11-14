@@ -82,3 +82,23 @@ export function learnedPercent(cards) {
   if (cards.length === 0) return 0
   return Math.round((cards.filter(isLearned).length / cards.length) * 100)
 }
+
+/**
+ * Mapa de atividade: `weeks` colunas (segunda a domingo), da mais antiga para a atual.
+ * level vai de 0 (nada) a 3 (dia cheio), relativo ao dia com mais respostas.
+ */
+export function activityGrid(days, now, weeks = 16) {
+  const firstMonday = addDays(startOfWeek(now), -7 * (weeks - 1))
+  const todayKey = dayKey(now)
+  const cells = []
+  for (let i = 0; i < weeks * 7; i++) {
+    const key = dayKey(addDays(firstMonday, i))
+    const day = days[key]
+    cells.push({ key, count: day ? day.reviews + day.quizTotal : 0, isFuture: key > todayKey })
+  }
+  const max = Math.max(0, ...cells.map((cell) => cell.count))
+  return cells.map((cell) => ({
+    ...cell,
+    level: cell.count === 0 || max === 0 ? 0 : Math.min(3, Math.ceil((cell.count / max) * 3)),
+  }))
+}

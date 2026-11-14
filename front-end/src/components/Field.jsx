@@ -45,7 +45,7 @@ export function Select({ className, children, ...props }) {
 }
 
 /** Alternador de duas ou mais opções: [Cartão | Questão] */
-export function Segmented({ label, options, value, onChange }) {
+export function Segmented({ label, options, value, onChange, size = 'md' }) {
   return (
     <div
       role="group"
@@ -62,7 +62,7 @@ export function Segmented({ label, options, value, onChange }) {
             aria-pressed={selected}
             onClick={() => onChange(option.value)}
             className={cx(
-              'h-11 rounded-[11px] border-2 text-[15px]',
+              size === 'sm' ? 'h-9 rounded-[9px] border-2 px-2 text-sm' : 'h-11 rounded-[11px] border-2 text-[15px]',
               selected ? 'border-ink bg-ink font-bold text-lime' : 'border-transparent font-semibold text-graphite',
             )}
           >

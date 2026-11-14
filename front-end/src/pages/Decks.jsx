@@ -1,12 +1,12 @@
 import { useState } from 'react'
 import { Button } from '../components/Button'
-import { DeckTile } from '../components/DeckTile'
+import { DECK_GRID, DeckTile, NewDeckTile } from '../components/DeckTile'
 import { EmptyState } from '../components/EmptyState'
 import { Icon } from '../components/Icon'
 import { PageHeader, Screen } from '../components/Screen'
 import { buildSession } from '../lib/srs'
 import { learnedPercent } from '../lib/stats'
-import { plural } from '../lib/utils'
+import { cx, plural } from '../lib/utils'
 import { useStore } from '../store/context'
 
 export default function Decks() {
@@ -34,7 +34,7 @@ export default function Decks() {
           <p className="text-[15px] text-graphite">
             {plural(state.decks.length, 'baralho', 'baralhos')} · {plural(state.cards.length, 'cartão', 'cartões')}
           </p>
-          <ul className="flex flex-col gap-3 pb-2">
+          <ul className={cx(DECK_GRID, 'pb-2')}>
             {state.decks.map((deck) => {
               const cards = state.cards.filter((card) => card.deckId === deck.id)
               return (
@@ -48,6 +48,9 @@ export default function Decks() {
                 </li>
               )
             })}
+            <li className="hidden sm:block">
+              <NewDeckTile className="h-full" />
+            </li>
           </ul>
         </>
       )}

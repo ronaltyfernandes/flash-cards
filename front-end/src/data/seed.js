@@ -1,4 +1,5 @@
 /* Baralhos de exemplo para o app não começar vazio. Pode apagar todos pela tela de Baralhos. */
+import { dayKey } from '../lib/dates'
 import { newSrs } from '../lib/srs'
 import { newId } from '../lib/utils'
 import { STATE_VERSION } from './storage'
@@ -66,6 +67,36 @@ const SAMPLE_DECKS = [
   },
 ]
 
+/*
+ * Histórico de estudo de demonstração: 130 dias seguidos até hoje, com
+ * mais revisões em dias úteis, uma ou outra pausa de quiz e acerto variado.
+ * Gerador determinístico (sempre o mesmo histórico), para o visual não mudar a cada recarga.
+ */
+const HISTORY_DAYS = 130
+
+function buildHistory(now) {
+  let seed = 20260101
+  const random = () => {
+    seed = (seed * 16807) % 2147483647
+    return seed / 2147483647
+  }
+  const days = {}
+  const today = new Date(now)
+  today.setHours(0, 0, 0, 0)
+  for (let i = 0; i < HISTORY_DAYS; i++) {
+    const date = new Date(today)
+    date.setDate(date.getDate() - i)
+    const weekend = date.getDay() === 0 || date.getDay() === 6
+    const reviews = Math.round((weekend ? 8 : 16) + random() * (weekend ? 14 : 24))
+    const correct = Math.round(reviews * (0.74 + random() * 0.2))
+    const quizTotal = random() < 0.45 ? Math.round(2 + random() * 6) : 0
+    const quizCorrect = Math.round(quizTotal * (0.55 + random() * 0.4))
+    const newCards = Math.round(random() * 4)
+    days[dayKey(date.getTime())] = { reviews, correct, newCards, quizTotal, quizCorrect }
+  }
+  return days
+}
+
 export function createSeedState(now = Date.now()) {
   const decks = []
   const cards = []
@@ -97,5 +128,5 @@ export function createSeedState(now = Date.now()) {
     }
   }
 
-  return { version: STATE_VERSION, decks, cards, questions, days: {} }
+  return { version: STATE_VERSION, decks, cards, questions, days: buildHistory(now) }
 }

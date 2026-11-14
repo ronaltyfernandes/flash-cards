@@ -1,5 +1,5 @@
 import { useEffect } from 'react'
-import { matchRoute, useRoute } from './lib/router'
+import { Route, Routes, useLocation, useParams, useSearchParams } from 'react-router'
 import Create from './pages/Create'
 import DeckDetail from './pages/DeckDetail'
 import DeckForm from './pages/DeckForm'
@@ -11,36 +11,38 @@ import Quiz from './pages/Quiz'
 import QuizLobby from './pages/QuizLobby'
 import Study from './pages/Study'
 
-// A ordem importa: rotas fixas antes das que têm parâmetro (:deckId).
-const ROUTES = [
-  ['/', Home],
-  ['/baralhos', Decks],
-  ['/baralhos/novo', DeckForm],
-  ['/baralhos/:deckId', DeckDetail],
-  ['/baralhos/:deckId/editar', DeckForm],
-  ['/estudar', Study],
-  ['/estudar/:deckId', Study],
-  ['/questoes', QuizLobby],
-  ['/questoes/todas', Quiz],
-  ['/questoes/:deckId', Quiz],
-  ['/criar', Create],
-  ['/editar/cartao/:cardId', Create],
-  ['/editar/questao/:questionId', Create],
-  ['/progresso', Progress],
-]
-
-export default function App() {
-  const { path, query } = useRoute()
-  const routeKey = `${path}?${new URLSearchParams(query)}`
+/** Entrega `params` e `query` às telas e recria a tela a cada navegação, zerando o estado dela. */
+function Page({ component: Component }) {
+  const params = useParams()
+  const [searchParams] = useSearchParams()
+  const { pathname, search } = useLocation()
+  const key = `${pathname}${search}`
 
   useEffect(() => {
     window.scrollTo(0, 0)
-  }, [routeKey])
+  }, [key])
 
-  for (const [pattern, Page] of ROUTES) {
-    const params = matchRoute(pattern, path)
-    // `key` recria a tela a cada navegação, zerando o estado dela
-    if (params) return <Page key={routeKey} params={params} query={query} />
-  }
-  return <NotFound />
+  return <Component key={key} params={params} query={Object.fromEntries(searchParams)} />
+}
+
+export default function App() {
+  return (
+    <Routes>
+      <Route path="/" element={<Page component={Home} />} />
+      <Route path="/baralhos" element={<Page component={Decks} />} />
+      <Route path="/baralhos/novo" element={<Page component={DeckForm} />} />
+      <Route path="/baralhos/:deckId" element={<Page component={DeckDetail} />} />
+      <Route path="/baralhos/:deckId/editar" element={<Page component={DeckForm} />} />
+      <Route path="/estudar" element={<Page component={Study} />} />
+      <Route path="/estudar/:deckId" element={<Page component={Study} />} />
+      <Route path="/questoes" element={<Page component={QuizLobby} />} />
+      <Route path="/questoes/todas" element={<Page component={Quiz} />} />
+      <Route path="/questoes/:deckId" element={<Page component={Quiz} />} />
+      <Route path="/criar" element={<Page component={Create} />} />
+      <Route path="/editar/cartao/:cardId" element={<Page component={Create} />} />
+      <Route path="/editar/questao/:questionId" element={<Page component={Create} />} />
+      <Route path="/progresso" element={<Page component={Progress} />} />
+      <Route path="*" element={<NotFound />} />
+    </Routes>
+  )
 }

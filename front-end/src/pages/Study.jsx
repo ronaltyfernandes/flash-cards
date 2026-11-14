@@ -1,9 +1,12 @@
 import { useEffect, useEffectEvent, useState } from 'react'
+import { useNavigate } from 'react-router'
 import { Button, IconButton } from '../components/Button'
 import { DeckChip } from '../components/Chip'
 import { EmptyState } from '../components/EmptyState'
 import { FlashCard } from '../components/FlashCard'
 import { GradeButtons } from '../components/GradeButtons'
+import { Icon } from '../components/Icon'
+import { Kbd } from '../components/Kbd'
 import { ProgressBar } from '../components/ProgressBar'
 import { Screen } from '../components/Screen'
 import { canSpeak, speak } from '../lib/languages'
@@ -14,6 +17,7 @@ import { useStore } from '../store/context'
 /** Modo foco: um cartão por vez, fundo escuro. */
 export default function Study({ params, query }) {
   const { state, actions } = useStore()
+  const navigate = useNavigate()
   const deckId = params.deckId
   const free = query.modo === 'livre'
   const exitTo = deckId ? `/baralhos/${deckId}` : '/'
@@ -39,11 +43,18 @@ export default function Study({ params, query }) {
     setTurn((current) => current + 1)
   }
 
-  // Teclado: espaço vira o cartão, 1 a 4 avaliam
+  // Teclado: espaço vira o cartão, 1 a 4 avaliam, S fala a palavra, Esc sai
   const onKeyDown = useEffectEvent((event) => {
-    if (!card || event.metaKey || event.ctrlKey || event.altKey) return
+    if (event.metaKey || event.ctrlKey || event.altKey) return
+    if (event.key === 'Escape') {
+      navigate(exitTo)
+      return
+    }
+    if (!card) return
     const onControl = ['BUTTON', 'A', 'INPUT'].includes(event.target.tagName)
-    if (event.key === ' ' && !onControl) {
+    if ((event.key === 's' || event.key === 'S') && deck?.kind === 'language' && canSpeak()) {
+      speak(card.front, deck.from)
+    } else if (event.key === ' ' && !onControl) {
       event.preventDefault()
       setFlipped((current) => !current)
     } else if (flipped && ['1', '2', '3', '4'].includes(event.key)) {
@@ -100,7 +111,7 @@ export default function Study({ params, query }) {
           title="Mandou bem!"
           action={
             <>
-              <Button to="/questoes" variant="dark-lime">
+              <Button to={deckId ? `/questoes/${deckId}` : '/questoes'} variant="dark-lime">
                 Praticar questões
               </Button>
               <Button to={exitTo} variant="dark-outline">
@@ -127,50 +138,73 @@ export default function Study({ params, query }) {
   return (
     <Screen tone="dark">
       <h1 className="sr-only">Estudo: {deck.name}</h1>
-      <div className="flex items-center gap-3.5">
-        <IconButton icon="close" label="Sair do estudo" tone="dark" to={exitTo} />
-        <ProgressBar
-          tone="dark"
-          value={(done / total) * 100}
-          label="Andamento da sessão"
-          className="h-3.5 flex-1"
-        />
-        <span className="shrink-0 font-mono text-sm text-mist">
+      <div className="flex w-full items-center gap-3.5 sm:gap-4 lg:mx-auto lg:max-w-[1200px]">
+        <IconButton icon="close" label="Sair do estudo" tone="dark" to={exitTo} aria-keyshortcuts="Escape" />
+        <Kbd tone="dark">Esc</Kbd>
+        <ProgressBar tone="dark" value={(done / total) * 100} label="Andamento da sessão" className="h-3.5 flex-1" />
+        <span className="shrink-0 font-mono text-sm text-mist sm:text-[15px]">
           <span className="sr-only">Cartão </span>
           {Math.min(done + 1, total)}/{total}
         </span>
       </div>
 
-      <div className="flex min-h-11 items-center justify-between gap-3">
-        <div className="flex min-w-0 items-center gap-2.5">
-          {deck.kind === 'language' ? <DeckChip deck={deck} tone="dark" /> : null}
-          <span className="truncate text-[13px] text-mist">{deck.name}</span>
+      {/* Coluna do cartão: em pé com 560px no tablet, deitado com 640px no desktop */}
+      <div className="flex flex-1 flex-col gap-5 sm:mx-auto sm:w-full sm:max-w-[35rem] sm:justify-center sm:gap-6.5 lg:max-w-[40rem] lg:justify-start">
+        <div className="flex min-h-11 items-center justify-between gap-3">
+          <div className="flex min-w-0 items-center gap-2.5">
+            {deck.kind === 'language' ? <DeckChip deck={deck} tone="dark" /> : null}
+            <span className="truncate text-[13px] text-mist">{deck.name}</span>
+          </div>
+          {deck.kind === 'language' && canSpeak() ? (
+            <>
+              <IconButton
+                icon="volume"
+                label="Ouvir pronúncia"
+                tone="dark-strong"
+                aria-keyshortcuts="S"
+                onClick={() => speak(card.front, deck.from)}
+                className="sm:size-12 sm:rounded-btn lg:hidden"
+              />
+              <span className="hidden lg:contents">
+                <Button
+                  variant="dark-outline"
+                  size="sm"
+                  aria-keyshortcuts="S"
+                  onClick={() => speak(card.front, deck.from)}
+                  className="rounded-chip! pr-2.5! pl-3.5!"
+                >
+                  <Icon name="volume" size={20} strokeWidth={2} />
+                  Ouvir
+                  <Kbd tone="dark">S</Kbd>
+                </Button>
+              </span>
+            </>
+          ) : null}
         </div>
-        {deck.kind === 'language' && canSpeak() ? (
-          <IconButton
-            icon="volume"
-            label="Ouvir pronúncia"
-            tone="dark-strong"
-            onClick={() => speak(card.front, deck.from)}
-          />
-        ) : null}
-      </div>
 
-      <FlashCard
-        key={`${card.id}-${turn}`}
-        card={card}
-        flipped={flipped}
-        onFlip={() => setFlipped((current) => !current)}
-      />
+        <FlashCard
+          key={`${card.id}-${turn}`}
+          card={card}
+          flipped={flipped}
+          onFlip={() => setFlipped((current) => !current)}
+        />
 
-      <div className="flex min-h-[7.25rem] shrink-0 flex-col justify-end">
-        {flipped ? (
-          <GradeButtons intervals={previewIntervals(card.srs)} onGrade={grade} />
-        ) : (
-          <Button variant="dark-primary" size="lg" onClick={() => setFlipped(true)}>
-            Mostrar resposta
-          </Button>
-        )}
+        <div className="flex min-h-[7.25rem] shrink-0 flex-col justify-end sm:min-h-0 lg:min-h-28">
+          {flipped ? (
+            <GradeButtons intervals={previewIntervals(card.srs)} onGrade={grade} />
+          ) : (
+            <Button
+              variant="dark-primary"
+              size="lg"
+              aria-keyshortcuts="Space"
+              onClick={() => setFlipped(true)}
+              className="sm:h-15.5 sm:text-lg"
+            >
+              Mostrar resposta
+              <Kbd tone="flat">Espaço</Kbd>
+            </Button>
+          )}
+        </div>
       </div>
     </Screen>
   )

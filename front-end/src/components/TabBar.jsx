@@ -1,7 +1,6 @@
-import { useRoute } from '../lib/router'
+import { Link, useLocation } from 'react-router'
 import { cx } from '../lib/utils'
 import { Icon } from './Icon'
-import { Link } from './Link'
 
 const TABS = [
   { to: '/', label: 'Início', icon: 'home', isActive: (path) => path === '/' },
@@ -13,11 +12,11 @@ const TABS = [
 
 /** Barra de navegação inferior. O botão do meio cria um cartão. */
 export function TabBar() {
-  const { path } = useRoute()
+  const { pathname: path } = useLocation()
   return (
     <nav
       aria-label="Navegação principal"
-      className="sticky bottom-0 z-10 flex h-21 shrink-0 items-center justify-around border-t-2 border-ink bg-white px-1 pb-[env(safe-area-inset-bottom)] min-[360px]:px-2"
+      className="sticky bottom-0 z-10 flex h-21 sm:hidden shrink-0 items-center justify-around border-t-2 border-ink bg-white px-1 pb-[env(safe-area-inset-bottom)] min-[360px]:px-2"
     >
       {TABS.map((tab) => {
         if (tab.create) {

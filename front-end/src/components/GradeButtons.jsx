@@ -1,5 +1,6 @@
 import { GRADES } from '../lib/srs'
 import { cx } from '../lib/utils'
+import { Kbd } from './Kbd'
 
 // A claridade cresce do "errei" ao "fácil": não depende só da cor.
 const COLORS = {
@@ -16,10 +17,10 @@ const COLORS = {
 export function GradeButtons({ intervals, onGrade }) {
   return (
     <div className="flex animate-pop-in flex-col gap-2.5 motion-reduce:animate-none">
-      <p id="grade-label" className="text-center text-[13px] text-mist">
+      <p id="grade-label" className="text-center text-[13px] text-mist sm:text-sm">
         Quanto você lembrou?
       </p>
-      <div role="group" aria-labelledby="grade-label" className="grid grid-cols-4 gap-2">
+      <div role="group" aria-labelledby="grade-label" className="grid grid-cols-4 gap-2 sm:gap-3">
         {GRADES.map((grade, index) => (
           <button
             key={grade.id}
@@ -27,12 +28,17 @@ export function GradeButtons({ intervals, onGrade }) {
             onClick={() => onGrade(grade.id)}
             aria-keyshortcuts={String(index + 1)}
             className={cx(
-              'press flex h-18 flex-col items-center justify-center gap-0.5 rounded-2xl border-2 border-paper shadow-hard-paper',
+              'press flex h-18 flex-col items-center justify-center gap-0.5 rounded-2xl border-2 border-paper shadow-hard-paper sm:h-21 sm:gap-1 sm:rounded-[18px] sm:shadow-[4px_4px_0_var(--color-paper)] lg:h-19.5',
               COLORS[grade.id],
             )}
           >
-            <span className="text-[15px] font-bold">{grade.label}</span>
-            <span className="font-mono text-[11px]">{intervals[grade.id]}</span>
+            <span className="flex items-center gap-2">
+              <Kbd tone="flat" className="h-5.5 min-w-5.5 rounded-md">
+                {index + 1}
+              </Kbd>
+              <span className="text-[15px] font-bold sm:text-lg lg:text-[17px]">{grade.label}</span>
+            </span>
+            <span className="font-mono text-[11px] sm:text-xs">{intervals[grade.id]}</span>
           </button>
         ))}
       </div>

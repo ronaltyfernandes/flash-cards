@@ -2,7 +2,7 @@ import { Button } from '../components/Button'
 import { DeckBadge } from '../components/DeckTile'
 import { EmptyState } from '../components/EmptyState'
 import { Icon } from '../components/Icon'
-import { Link } from '../components/Link'
+import { Link } from 'react-router'
 import { PageHeader, Screen, SectionTitle } from '../components/Screen'
 import { countQuizItems } from '../lib/quiz'
 import { plural } from '../lib/utils'
@@ -48,22 +48,22 @@ export default function QuizLobby() {
         </EmptyState>
       ) : (
         <>
-          <section className="flex flex-col gap-4 rounded-[26px] border-2 border-ink bg-lime p-5.5 shadow-hard">
+          <section className="flex flex-col gap-4 rounded-[26px] border-2 border-ink bg-lime p-5.5 shadow-hard sm:flex-row sm:flex-wrap sm:items-center sm:justify-between sm:rounded-card sm:p-7.5 sm:shadow-hard-lg">
             <div className="flex flex-col gap-1">
               <p className="text-[13px] font-semibold tracking-[0.1em] uppercase">Rodada rápida</p>
-              <p className="font-display text-[32px] leading-none font-extrabold tracking-[-0.03em]">
+              <p className="font-display text-[32px] leading-none font-extrabold tracking-[-0.03em] sm:text-[44px]">
                 {plural(Math.min(ROUND_SIZE, total), 'questão', 'questões')}
               </p>
               <p className="text-sm">Misturando todos os seus baralhos.</p>
             </div>
-            <Button to="/questoes/todas" variant="ink">
+            <Button to="/questoes/todas" variant="ink" className="sm:h-14 sm:px-7">
               Começar
               <Icon name="arrow" size={20} strokeWidth={2.5} />
             </Button>
           </section>
 
           <SectionTitle>Por baralho</SectionTitle>
-          <ul className="flex flex-col gap-3 pb-2">
+          <ul className="grid gap-3 pb-2 sm:grid-cols-2 sm:gap-5 lg:grid-cols-3 lg:gap-6">
             {decks.map(({ deck, count }) => (
               <li key={deck.id}>
                 <Link

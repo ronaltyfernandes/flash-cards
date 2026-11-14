@@ -35,6 +35,14 @@ function escapeRegExp(text) {
 
 function fromCard(card, deck, deckCards, otherCards) {
   const isLanguage = deck.kind === 'language'
+  // O verso do cartão aparece depois da resposta, como no estudo
+  const reveal = {
+    front: card.front,
+    back: card.back,
+    ipa: isLanguage ? card.ipa || null : null,
+    example: card.example || null,
+    exampleTranslation: card.exampleTranslation || null,
+  }
 
   // Completar a frase: só quando o exemplo contém a frente do cartão
   const pattern = new RegExp(escapeRegExp(card.front), 'i')
@@ -57,6 +65,7 @@ function fromCard(card, deck, deckCards, otherCards) {
         hint: card.exampleTranslation || null,
         answerText: card.front,
         explanation: `“${card.front}” = ${card.back}.`,
+        reveal,
         ...toOptions(card.front, distractors),
       }
     }
@@ -89,6 +98,7 @@ function fromCard(card, deck, deckCards, otherCards) {
     context: isLanguage && card.example ? card.example : null,
     answerText: card.back,
     explanation: isLanguage ? `“${card.front}” = ${card.back}.` : `Resposta: ${card.back}.`,
+    reveal,
     ...toOptions(card.back, distractors),
   }
 }
@@ -103,6 +113,7 @@ function fromQuestion(question, deck) {
     question: question.prompt,
     answerText: question.answer,
     explanation: question.explanation || `Resposta: ${question.answer}.`,
+    reveal: { front: null, back: question.answer, ipa: null, example: question.explanation || null, exampleTranslation: null },
     ...toOptions(question.answer, question.wrong.filter(Boolean)),
   }
 }

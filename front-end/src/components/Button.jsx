@@ -1,3 +1,4 @@
+import { Link } from 'react-router'
 import { cx } from '../lib/utils'
 import { Icon } from './Icon'
 
@@ -37,9 +38,9 @@ export function Button({ variant = 'primary', size = 'md', to, className, childr
   const classes = cx(BASE, VARIANTS[variant], SIZES[size], className)
   if (to) {
     return (
-      <a href={`#${to}`} className={classes} {...props}>
+      <Link to={to} className={classes} {...props}>
         {children}
-      </a>
+      </Link>
     )
   }
   return (
@@ -66,9 +67,9 @@ export function IconButton({ icon, label, tone = 'light', to, className, ...prop
   const content = <Icon name={icon} size={20} strokeWidth={2.4} />
   if (to) {
     return (
-      <a href={`#${to}`} aria-label={label} className={classes} {...props}>
+      <Link to={to} aria-label={label} className={classes} {...props}>
         {content}
-      </a>
+      </Link>
     )
   }
   return (

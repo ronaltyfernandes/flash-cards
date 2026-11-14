@@ -7,7 +7,7 @@ const TONES = {
 }
 
 /** Barra de progresso. `value` vai de 0 a 100. */
-export function ProgressBar({ value, label, tone = 'light', className }) {
+export function ProgressBar({ value, label, tone = 'light', className, fillClassName }) {
   const percent = Math.max(0, Math.min(100, value))
   const { track, fill, edge } = TONES[tone]
   return (
@@ -24,6 +24,7 @@ export function ProgressBar({ value, label, tone = 'light', className }) {
           'h-full transition-[width] duration-300 motion-reduce:transition-none',
           fill,
           percent > 0 && percent < 100 && edge,
+          fillClassName,
         )}
         style={{ width: `${percent}%` }}
       />
